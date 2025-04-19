@@ -1,16 +1,16 @@
-
 /* 
    Campus Connect Main Stylesheet
-   A clean, modern design for educational platform
+   A clean, modern design for educational platform with orange & white theme
 */
 
 :root {
-    --primary-color: #4a86e8;
+    --primary-color: #F97316; /* Changed to orange */
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --danger-color: #dc3545;
     --light-color: #f8f9fa;
     --dark-color: #343a40;
+    --accent-color: #FEC6A1; /* Soft orange as accent */
     --font-family: 'Roboto', 'Segoe UI', sans-serif;
 }
 
@@ -80,10 +80,10 @@ body {
 
 /* Hero Section */
 .hero {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #fff 0%, #FEC6A1 100%);
     padding-top: 80px; /* Account for fixed header */
 }
 
@@ -125,7 +125,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #3a76d8;
+    background-color: #e86209;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -244,6 +244,153 @@ body {
     border-top: 1px solid #e9ecef;
 }
 
+/* Features Section */
+.features-section {
+    padding: 4rem 0;
+    background-color: #fff;
+}
+
+.features-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 2rem;
+}
+
+.feature-card {
+    flex: 1;
+    min-width: 300px;
+    max-width: 350px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.feature-description {
+    color: var(--secondary-color);
+    line-height: 1.6;
+}
+
+/* Stats Section */
+.stats-section {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 2rem;
+}
+
+.stat-item {
+    flex: 1;
+    min-width: 200px;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1.2rem;
+}
+
+/* Profile Section */
+.profile-section {
+    padding: 3rem 0;
+    background-color: #f9f9f9;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-form {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-picture-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid var(--primary-color);
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.upload-btn {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background-color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Form field display errors */
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .header-content {
@@ -265,6 +412,16 @@ body {
     
     .role-toggle {
         width: 100%;
+    }
+    
+    .features-container, .stats-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .feature-card {
+        width: 90%;
+        max-width: 400px;
     }
 }
 
