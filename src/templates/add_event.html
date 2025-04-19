@@ -19,9 +19,12 @@
                     <div class="logo-text">Campus Connect</div>
                 </a>
             </div>
-            <div>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline" style="display: flex; align-items: center;">
-                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i> Logout
+            <div class="nav-buttons">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline" style="margin-right: 10px;">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
         </div>
@@ -30,55 +33,64 @@
     <!-- Main Content -->
     <div class="profile-section" style="margin-top: 80px;">
         <div class="container profile-container">
-            <h2 style="text-align: center; margin-bottom: 2rem;">Add Event</h2>
-            
-            <!-- Flash Messages -->
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-            
-            <form class="profile-form" method="POST" action="{{ url_for('add_event') }}" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="event_name" class="form-label">Event Name</label>
-                    <input type="text" id="event_name" name="event_name" class="form-control" required placeholder="Annual Tech Conference">
+            <div class="card p-4">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Add New Event</h2>
+                
+                <!-- Flash Messages -->
+                <div class="flash-messages">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                 </div>
                 
-                <div class="form-row" style="display: flex; gap: 20px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="event_date" class="form-label">Event Date & Time</label>
-                        <input type="datetime-local" id="event_date" name="event_date" class="form-control" required>
+                <form class="profile-form" method="POST" action="{{ url_for('add_event') }}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="event_name" class="form-label">Event Name <span class="text-danger">*</span></label>
+                        <input type="text" id="event_name" name="event_name" class="form-control" required placeholder="Annual Tech Conference">
                     </div>
                     
-                    <div class="form-group" style="flex: 1;">
-                        <label for="event_location" class="form-label">Event Location</label>
-                        <input type="text" id="event_location" name="event_location" class="form-control" required placeholder="Main Campus Auditorium">
+                    <div class="form-row" style="display: flex; gap: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="event_date" class="form-label">Event Date & Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" id="event_date" name="event_date" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group" style="flex: 1;">
+                            <label for="event_location" class="form-label">Event Location <span class="text-danger">*</span></label>
+                            <input type="text" id="event_location" name="event_location" class="form-control" required placeholder="Main Campus Auditorium">
+                        </div>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Provide details about the event, including schedule, speakers, etc."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="event_image" class="form-label">Event Image (Optional)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="event_image" name="event_image" class="form-control" accept="image/*">
-                        <small class="text-muted">Upload an image to promote your event. Max size: 5MB</small>
+                    
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="4" placeholder="Provide details about the event, including schedule, speakers, etc."></textarea>
                     </div>
-                </div>
-                
-                <div style="display: flex; gap: 10px; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">Add Event</button>
-                    <a href="{{ url_for('profile') }}" class="btn btn-outline" style="flex: 1; text-align: center;">Cancel</a>
-                </div>
-            </form>
+                    
+                    <div class="form-group">
+                        <label for="event_image" class="form-label">Event Image</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="event_image" name="event_image" class="form-control" accept="image/*">
+                            <small class="text-muted">Upload an image to promote your event. Max size: 5MB. Recommended size: 1200x600px.</small>
+                        </div>
+                        <div id="image-preview" class="mt-4" style="display: none;">
+                            <img src="#" alt="Image Preview" style="max-width: 100%; max-height: 200px;">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-plus-circle"></i> Add Event
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline" style="flex: 1; text-align: center;">
+                            <i class="fas fa-times-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -90,14 +102,38 @@
     </footer>
 
     <script>
-        // Preview event image before upload
+        // Initialize date-time picker with current datetime
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const defaultDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('event_date').value = defaultDateTime;
+        });
+        
+        // Image preview functionality
         document.getElementById('event_image').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
                 if (file.size > 5 * 1024 * 1024) {
                     alert('File size exceeds 5MB limit');
                     this.value = '';
+                    document.getElementById('image-preview').style.display = 'none';
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('image-preview');
+                        preview.style.display = 'block';
+                        preview.querySelector('img').src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
                 }
+            } else {
+                document.getElementById('image-preview').style.display = 'none';
             }
         });
     </script>

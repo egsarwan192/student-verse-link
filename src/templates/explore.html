@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,191 +10,181 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container header-content">
-            <div class="logo">
-                <a href="{{ url_for('dashboard') }}">
-                    <i class="fas fa-graduation-cap text-primary"></i>
-                    <span class="logo-text">Campus Connect</span>
-                </a>
-            </div>
-            <div class="user-menu">
-                <a href="{{ url_for('logout') }}" class="btn btn-outline">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
+    <!-- Main Dashboard Container -->
     <div class="dashboard-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-profile">
-                {% if user.role == 'student' %}
-                    {% set profile = user.student_profile %}
-                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + profile.profile_picture) }}" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_profile.jpg') }}'">
-                    <div class="user-name">{{ profile.first_name }} {{ profile.last_name }}</div>
-                {% else %}
-                    {% set profile = user.college_profile %}
-                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + profile.profile_picture) }}" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
-                    <div class="user-name">{{ profile.campus_name }}</div>
-                {% endif %}
+                <img src="{{ url_for('static', filename='uploads/profile_pictures/' + user.student_profile.profile_picture) }}" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_profile.jpg') }}'">
+                <div class="user-name">{{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</div>
                 <div class="user-role">{{ user.role.capitalize() }}</div>
             </div>
             
             <ul class="nav-links">
-                <li>
-                    <a href="{{ url_for('dashboard') }}">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('profile') }}">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('explore') }}" class="active">
-                        <i class="fas fa-search"></i>
-                        <span>Explore</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-users"></i>
-                        <span>Connections</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-bell"></i>
-                        <span>Notifications</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout') }}">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
+                <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                <li><a href="{{ url_for('explore') }}" class="active"><i class="fas fa-search"></i><span>Explore</span></a></li>
+                <li><a href="#"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
             </ul>
         </div>
 
         <!-- Main Content -->
         <div class="main-content">
-            <div class="search-container card">
+            <div class="page-header">
+                <h1>Explore Campus Connect</h1>
+                <p>Discover students, colleges, and events across the platform</p>
+            </div>
+
+            <!-- Search Form -->
+            <div class="search-container">
                 <form action="{{ url_for('explore') }}" method="GET" class="search-form">
-                    <div class="search-input-wrapper">
-                        <input type="text" name="q" placeholder="Search students, colleges, events..." value="{{ search_query }}" class="search-input">
-                        <button type="submit" class="search-btn">
-                            <i class="fas fa-search"></i> Search
-                        </button>
-                    </div>
-                    <div class="search-categories">
-                        <label class="radio-label">
-                            <input type="radio" name="type" value="all" {% if search_type == 'all' %}checked{% endif %}> All
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="type" value="students" {% if search_type == 'students' %}checked{% endif %}> Students
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="type" value="colleges" {% if search_type == 'colleges' %}checked{% endif %}> Colleges
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="type" value="events" {% if search_type == 'events' %}checked{% endif %}> Events
-                        </label>
+                    <div class="search-controls">
+                        <div class="search-input-wrapper">
+                            <input type="text" name="q" placeholder="Search students, colleges, events..." value="{{ request.args.get('q', '') }}" class="search-input">
+                            <button type="submit" class="search-btn">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        <div class="search-filter">
+                            <select name="type" class="form-control">
+                                <option value="all" {% if request.args.get('type') == 'all' or not request.args.get('type') %}selected{% endif %}>All</option>
+                                <option value="students" {% if request.args.get('type') == 'students' %}selected{% endif %}>Students</option>
+                                <option value="colleges" {% if request.args.get('type') == 'colleges' %}selected{% endif %}>Colleges</option>
+                                <option value="events" {% if request.args.get('type') == 'events' %}selected{% endif %}>Events</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
 
-            <!-- Search Results -->
-            {% if search_query %}
-                <div class="search-results">
+            <!-- Results Section -->
+            {% if request.args.get('q') %}
+                <div class="results-section">
+                    <h2 class="results-title">Search Results for "{{ request.args.get('q') }}"</h2>
+                    
                     {% if students %}
-                        <div class="results-section">
-                            <h2>Students</h2>
-                            <div class="results-grid">
-                                {% for student in students %}
-                                    <div class="student-card">
-                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + student.profile_picture) }}" alt="{{ student.first_name }}" class="student-avatar">
+                        <h3>Students</h3>
+                        <div class="results-grid">
+                            {% for student in students %}
+                                <div class="student-card card">
+                                    <div class="student-header">
+                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + student.profile_picture) }}" alt="{{ student.first_name }}" class="student-avatar" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_profile.jpg') }}'">
                                         <div class="student-info">
-                                            <h3>{{ student.first_name }} {{ student.last_name }}</h3>
-                                            <p>{{ student.college_name }}</p>
-                                            <p class="student-course">{{ student.course }}</p>
-                                        </div>
-                                        <div class="card-actions">
-                                            <button class="btn btn-primary btn-sm">Connect</button>
-                                            <button class="btn btn-outline btn-sm">View Profile</button>
+                                            <h4>{{ student.first_name }} {{ student.last_name }}</h4>
+                                            <p class="student-details">{{ student.course }} @ {{ student.college_name }}</p>
                                         </div>
                                     </div>
-                                {% endfor %}
-                            </div>
+                                    <p class="student-bio">{{ student.bio|truncate(100) if student.bio else 'No bio available' }}</p>
+                                    <div class="card-actions">
+                                        <a href="#" class="btn btn-sm btn-primary">Connect</a>
+                                        <a href="#" class="btn btn-sm btn-outline">View Profile</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     {% endif %}
-
+                    
                     {% if colleges %}
-                        <div class="results-section">
-                            <h2>Colleges</h2>
-                            <div class="results-grid">
-                                {% for college in colleges %}
-                                    <div class="college-card">
-                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + college.profile_picture) }}" alt="{{ college.campus_name }}" class="college-avatar">
+                        <h3>Colleges</h3>
+                        <div class="results-grid">
+                            {% for college in colleges %}
+                                <div class="college-card card">
+                                    <div class="college-header">
+                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + college.profile_picture) }}" alt="{{ college.campus_name }}" class="college-avatar" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
                                         <div class="college-info">
-                                            <h3>{{ college.campus_name }}</h3>
-                                            <p>{{ college.campus_location }}</p>
-                                        </div>
-                                        <div class="card-actions">
-                                            <button class="btn btn-primary btn-sm">Follow</button>
-                                            <button class="btn btn-outline btn-sm">View Profile</button>
+                                            <h4>{{ college.campus_name }}</h4>
+                                            <p class="college-details">{{ college.campus_location }}</p>
                                         </div>
                                     </div>
-                                {% endfor %}
-                            </div>
+                                    <p class="college-description">{{ college.description|truncate(100) if college.description else 'No description available' }}</p>
+                                    <div class="card-actions">
+                                        <a href="#" class="btn btn-sm btn-primary">Visit</a>
+                                        <a href="#" class="btn btn-sm btn-outline">View Courses</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     {% endif %}
-
+                    
                     {% if events %}
-                        <div class="results-section">
-                            <h2>Events</h2>
-                            <div class="events-grid">
-                                {% for event in events %}
-                                    <div class="event-card">
-                                        {% if event.event_image %}
-                                            <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}" class="event-image">
-                                        {% endif %}
-                                        <div class="event-content">
-                                            <h3>{{ event.event_name }}</h3>
-                                            <p>{{ event.event_date.strftime('%B %d, %Y') }}</p>
-                                            <p>{{ event.event_location }}</p>
+                        <h3>Events</h3>
+                        <div class="events-grid">
+                            {% for event in events %}
+                                <div class="event-card">
+                                    {% if event.event_image %}
+                                        <div class="event-image">
+                                            <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}" onerror="this.src='{{ url_for('static', filename='uploads/gallery/default_event.jpg') }}'">
                                         </div>
-                                        <div class="card-actions">
-                                            <button class="btn btn-primary btn-sm">Details</button>
+                                    {% endif %}
+                                    <div class="event-content">
+                                        <h3>{{ event.event_name }}</h3>
+                                        <div class="event-meta">
+                                            <p><i class="fas fa-calendar"></i> {{ event.event_date.strftime('%B %d, %Y') }}</p>
+                                            <p><i class="fas fa-map-marker-alt"></i> {{ event.event_location }}</p>
+                                        </div>
+                                        {% if event.description %}
+                                            <div class="event-description">
+                                                <p>{{ event.description|truncate(100) }}</p>
+                                            </div>
+                                        {% endif %}
+                                        <div class="event-actions">
+                                            <a href="#" class="btn btn-sm btn-primary">View Details</a>
                                         </div>
                                     </div>
-                                {% endfor %}
-                            </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    {% if not students and not colleges and not events %}
+                        <div class="empty-state">
+                            <i class="fas fa-search fa-3x"></i>
+                            <h3>No results found</h3>
+                            <p>Try different search terms or browse categories</p>
                         </div>
                     {% endif %}
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-search fa-3x"></i>
-                    <h2>Start Exploring</h2>
-                    <p>Search for students, colleges, or events to connect with the community</p>
+                <div class="explore-categories">
+                    <div class="category-card">
+                        <div class="category-icon"><i class="fas fa-user-graduate"></i></div>
+                        <h3>Students</h3>
+                        <p>Connect with students from various colleges</p>
+                        <a href="{{ url_for('explore') }}?type=students" class="btn btn-primary">Browse Students</a>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon"><i class="fas fa-university"></i></div>
+                        <h3>Colleges</h3>
+                        <p>Discover educational institutions</p>
+                        <a href="{{ url_for('explore') }}?type=colleges" class="btn btn-primary">Browse Colleges</a>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <h3>Events</h3>
+                        <p>Find upcoming campus events</p>
+                        <a href="{{ url_for('explore') }}?type=events" class="btn btn-primary">Browse Events</a>
+                    </div>
                 </div>
             {% endif %}
         </div>
     </div>
+
+    <script>
+        // Add animations to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.student-card, .college-card, .category-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.1)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-</lov-write>

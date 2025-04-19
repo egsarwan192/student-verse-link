@@ -16,10 +16,10 @@
         <div class="sidebar">
             <div class="sidebar-profile">
                 {% if user.role == 'student' %}
-                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + user.student_profile.profile_picture) }}" alt="Profile Picture">
+                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + user.student_profile.profile_picture) }}" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_profile.jpg') }}'">
                     <div class="user-name">{{ user.student_profile.first_name }} {{ user.student_profile.last_name }}</div>
                 {% else %}
-                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + user.college_profile.profile_picture) }}" alt="College Logo">
+                    <img src="{{ url_for('static', filename='uploads/profile_pictures/' + user.college_profile.profile_picture) }}" alt="College Logo" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
                     <div class="user-name">{{ user.college_profile.campus_name }}</div>
                 {% endif %}
                 <div class="user-role">{{ user.role.capitalize() }}</div>
@@ -51,37 +51,50 @@
                         <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                         <h3>Search Campus Events</h3>
                         <p>Find upcoming events at various campuses</p>
+                        <a href="{{ url_for('explore') }}?type=events" class="btn btn-sm btn-primary mt-4">Explore Events</a>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-university"></i></div>
                         <h3>Browse Campuses</h3>
                         <p>Explore different colleges and their offerings</p>
+                        <a href="{{ url_for('explore') }}?type=colleges" class="btn btn-sm btn-primary mt-4">Find Colleges</a>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-bell"></i></div>
                         <h3>Check Notifications</h3>
                         <p>Stay updated with latest activities</p>
+                        <a href="#" class="btn btn-sm btn-primary mt-4">View Notifications</a>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <h3>Find Other Students</h3>
                         <p>Connect with peers from different colleges</p>
+                        <a href="{{ url_for('explore') }}?type=students" class="btn btn-sm btn-primary mt-4">Find Students</a>
                     </div>
                 {% else %}
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-calendar-plus"></i></div>
                         <h3>Add Event</h3>
                         <p>Create a new campus event</p>
+                        <a href="{{ url_for('add_event') }}" class="btn btn-sm btn-primary mt-4">Create Event</a>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
                         <h3>Manage Courses</h3>
                         <p>Update course offerings</p>
+                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-primary mt-4">View Courses</a>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-images"></i></div>
                         <h3>Update Gallery</h3>
                         <p>Add campus photos</p>
+                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-primary mt-4">View Gallery</a>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-cog"></i></div>
+                        <h3>Manage Profile</h3>
+                        <p>Update your college profile</p>
+                        <a href="{{ url_for('edit_college_profile') }}" class="btn btn-sm btn-primary mt-4">Edit Profile</a>
                     </div>
                 {% endif %}
             </div>
@@ -93,7 +106,7 @@
                     <div class="event-card">
                         {% if event.event_image %}
                             <div class="event-image">
-                                <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}">
+                                <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}" onerror="this.src='{{ url_for('static', filename='uploads/gallery/default_event.jpg') }}'">
                             </div>
                         {% endif %}
                         <div class="event-content">
@@ -102,6 +115,16 @@
                                 <p><i class="fas fa-calendar"></i> {{ event.event_date.strftime('%B %d, %Y') }}</p>
                                 <p><i class="fas fa-map-marker-alt"></i> {{ event.event_location }}</p>
                             </div>
+                            {% if event.description %}
+                                <div class="event-description">
+                                    <p>{{ event.description|truncate(100) }}</p>
+                                </div>
+                            {% endif %}
+                            {% if user.role == 'college' and event.college_id == user.id %}
+                                <div class="event-actions">
+                                    <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-sm btn-outline">Edit</a>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% else %}
@@ -110,5 +133,20 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Add some animations to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
