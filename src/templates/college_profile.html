@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Profile - Campus Connect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Campus Connect Logo" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2036%2036%22%3E%3Ccircle%20fill%3D%22%23F97316%22%20cx%3D%2218%22%20cy%3D%2218%22%20r%3D%2218%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C6C11.4%2C6%2C6%2C11.4%2C6%2C18s5.4%2C12%2C12%2C12s12-5.4%2C12-12S24.6%2C6%2C18%2C6z%20M18%2C8c5.5%2C0%2C10%2C4.5%2C10%2C10s-4.5%2C10-10%2C10S8%2C23.5%2C8%2C18S12.5%2C8%2C18%2C8z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C10.5c-1.7%2C0-3%2C1.3-3%2C3s1.3%2C3%2C3%2C3s3-1.3%2C3-3S19.7%2C10.5%2C18%2C10.5z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C18c-3.9%2C0-7%2C3.1-7%2C7h14C25%2C21.1%2C21.9%2C18%2C18%2C18z%22%2F%3E%3C%2Fsvg%3E'">
+                    <div class="logo-text">Campus Connect</div>
+                </a>
+            </div>
+            <div>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline" style="display: flex; align-items: center;">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-profile">
+                <img src="{{ url_for('static', filename='uploads/profile_pictures/' + profile.profile_picture) }}" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
+                <div class="user-name">{{ profile.campus_name }}</div>
+                <div class="user-role">{{ user.role.capitalize() }}</div>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="{{ url_for('dashboard') }}">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('profile') }}" class="active">
+                        <i class="fas fa-university"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-cover" style="background-color: #FEC6A1;">
+                    <div class="profile-avatar">
+                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + profile.profile_picture) }}" alt="{{ profile.campus_name }}" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h1>{{ profile.campus_name }}</h1>
+                    <p class="profile-headline">{{ profile.campus_location }} • Est. {{ profile.established_year }}</p>
+                </div>
+            </div>
+            
+            <!-- Profile Tabs -->
+            <div class="profile-tabs">
+                <div class="tabs">
+                    <ul class="tab-nav">
+                        <li class="tab-item active" data-tab="about">About</li>
+                        <li class="tab-item" data-tab="events">Events</li>
+                        <li class="tab-item" data-tab="gallery">Gallery</li>
+                    </ul>
+                    
+                    <!-- About Tab -->
+                    <div class="tab-content active" id="about">
+                        <div class="tab-header">
+                            <h2>About</h2>
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-outline btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <div class="card p-4">
+                            <h3>Description</h3>
+                            <p>{{ profile.description or 'No description added yet.' }}</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div>
+                                    <h4>Location</h4>
+                                    <p>{{ profile.campus_location }}</p>
+                                </div>
+                                <div>
+                                    <h4>Established</h4>
+                                    <p>{{ profile.established_year }}</p>
+                                </div>
+                                <div>
+                                    <h4>Website</h4>
+                                    <p>{{ profile.website or 'Not provided' }}</p>
+                                </div>
+                                <div>
+                                    <h4>Contact</h4>
+                                    <p>{{ profile.contact_email or 'Email not provided' }}</p>
+                                    <p>{{ profile.contact_phone or 'Phone not provided' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Courses Offered -->
+                        <div class="mt-6">
+                            <div class="tab-header">
+                                <h3>Courses Offered</h3>
+                                <a href="{{ url_for('add_course') }}" class="btn btn-outline btn-sm">
+                                    <i class="fas fa-plus"></i> Add Course
+                                </a>
+                            </div>
+                            
+                            {% if courses %}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {% for course in courses %}
+                                        <div class="card p-4">
+                                            <div class="flex justify-between">
+                                                <h4>{{ course.course_name }}</h4>
+                                                <div>
+                                                    <a href="{{ url_for('edit_course', course_id=course.id) }}" class="btn btn-icon">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{{ url_for('delete_course', course_id=course.id) }}" class="btn btn-icon text-danger" onclick="return confirm('Are you sure you want to delete this course?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            {% if course.course_code %}
+                                                <p class="text-sm text-muted">Code: {{ course.course_code }}</p>
+                                            {% endif %}
+                                            {% if course.department %}
+                                                <p class="text-sm">Department: {{ course.department }}</p>
+                                            {% endif %}
+                                            {% if course.duration %}
+                                                <p class="text-sm">Duration: {{ course.duration }}</p>
+                                            {% endif %}
+                                            {% if course.description %}
+                                                <p class="mt-2">{{ course.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card p-4">
+                                    <p class="text-center text-muted">No courses added yet.</p>
+                                    <div class="text-center mt-4">
+                                        <a href="{{ url_for('add_course') }}" class="btn btn-primary">Add First Course</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Events Tab -->
+                    <div class="tab-content" id="events">
+                        <div class="tab-header">
+                            <h2>Events</h2>
+                            <a href="{{ url_for('add_event') }}" class="btn btn-outline btn-sm">
+                                <i class="fas fa-plus"></i> Add Event
+                            </a>
+                        </div>
+                        
+                        {% if events %}
+                            <div class="events-grid">
+                                {% for event in events %}
+                                    <div class="event-card card">
+                                        {% if event.event_image %}
+                                            <div class="event-image">
+                                                <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}">
+                                            </div>
+                                        {% endif %}
+                                        <div class="event-content p-4">
+                                            <div class="flex justify-between">
+                                                <h3>{{ event.event_name }}</h3>
+                                                <div>
+                                                    <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-icon">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{{ url_for('delete_event', event_id=event.id) }}" class="btn btn-icon text-danger" onclick="return confirm('Are you sure you want to delete this event?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="event-meta">
+                                                <p><i class="fas fa-calendar-alt"></i> {{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                                <p><i class="fas fa-map-marker-alt"></i> {{ event.event_location }}</p>
+                                            </div>
+                                            {% if event.description %}
+                                                <p class="event-description mt-3">{{ event.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="card p-4">
+                                <p class="text-center text-muted">No events added yet.</p>
+                                <div class="text-center mt-4">
+                                    <a href="{{ url_for('add_event') }}" class="btn btn-primary">Add First Event</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Gallery Tab -->
+                    <div class="tab-content" id="gallery">
+                        <div class="tab-header">
+                            <h2>Gallery</h2>
+                            <form action="{{ url_for('add_gallery_image') }}" method="POST" enctype="multipart/form-data" id="gallery-form">
+                                <div class="flex items-center gap-2">
+                                    <input type="text" name="caption" placeholder="Image caption (optional)" class="form-control form-control-sm">
+                                    <label for="gallery-upload" class="btn btn-outline btn-sm">
+                                        <i class="fas fa-upload"></i> Upload
+                                    </label>
+                                    <input type="file" id="gallery-upload" name="gallery_image" style="display: none;" onchange="document.getElementById('gallery-form').submit();">
+                                </div>
+                            </form>
+                        </div>
+                        
+                        {% if gallery %}
+                            <div class="gallery-grid">
+                                {% for image in gallery %}
+                                    <div class="gallery-item">
+                                        <img src="{{ url_for('static', filename='uploads/gallery/' + image.image_path) }}" alt="{{ image.caption or 'Campus image' }}">
+                                        <div class="gallery-caption">
+                                            <p>{{ image.caption }}</p>
+                                            <a href="{{ url_for('delete_gallery_image', image_id=image.id) }}" class="gallery-delete" onclick="return confirm('Are you sure you want to delete this image?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="card p-4">
+                                <p class="text-center text-muted">No images in gallery yet.</p>
+                                <div class="text-center mt-4">
+                                    <label for="gallery-upload-empty" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Upload First Image
+                                    </label>
+                                    <input type="file" id="gallery-upload-empty" name="gallery_image" style="display: none;" onchange="document.getElementById('gallery-form').submit();">
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabItems = document.querySelectorAll('.tab-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to current tab
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
