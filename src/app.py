@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -151,7 +150,49 @@ def allowed_file(filename, types):
 def index():
     return render_template('index.html')
 
-# ... keep existing code (login, signup routes)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        role = request.form.get('role')  # 'student' or 'college'
+
+        # Check if user already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email already registered', 'danger')
+            return redirect(url_for('register'))
+
+        # Hash the password
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        # Create new user
+        new_user = User(email=email, password_hash=hashed_password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.check_password_hash(user.password_hash, password):
+            session['user_id'] = user.id
+            session['role'] = user.role
+            flash('Successfully logged in!', 'success')
+            return redirect(url_for('dashboard'))
+        
+        flash('Invalid email or password', 'danger')
+        return redirect(url_for('login'))
+    
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
@@ -631,192 +672,4 @@ def add_event():
 
 @app.route('/edit-event/<int:event_id>', methods=['GET', 'POST'])
 def edit_event(event_id):
-    if 'user_id' not in session or User.query.get(session['user_id']).role != 'college':
-        return redirect(url_for('login'))
-    
-    event = CollegeEvent.query.get_or_404(event_id)
-    profile = CollegeProfile.query.filter_by(id=event.college_id).first()
-    
-    # Security check to ensure user owns this event
-    if profile.user_id != session['user_id']:
-        flash('Unauthorized access', 'danger')
-        return redirect(url_for('profile'))
-    
-    if request.method == 'POST':
-        event.event_name = request.form.get('event_name')
-        event.event_date = datetime.strptime(request.form.get('event_date'), '%Y-%m-%dT%H:%M')
-        event.event_location = request.form.get('event_location')
-        event.description = request.form.get('description')
-        
-        if 'event_image' in request.files:
-            file = request.files['event_image']
-            if file and file.filename != '' and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
-                filename = secure_filename(f"event_{profile.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-                file_path = os.path.join(app.root_path, app.config['GALLERY_FOLDER'], filename)
-                file.save(file_path)
-                
-                # Delete old event image if exists
-                if event.event_image:
-                    try:
-                        old_file_path = os.path.join(app.root_path, app.config['GALLERY_FOLDER'], event.event_image)
-                        if os.path.exists(old_file_path):
-                            os.remove(old_file_path)
-                    except Exception as e:
-                        print(f"Error removing old event image: {e}")
-                
-                event.event_image = filename
-        
-        db.session.commit()
-        flash('Event updated successfully!', 'success')
-        return redirect(url_for('profile'))
-    
-    return render_template('edit_event.html', event=event)
-
-@app.route('/delete-event/<int:event_id>')
-def delete_event(event_id):
-    if 'user_id' not in session or User.query.get(session['user_id']).role != 'college':
-        return redirect(url_for('login'))
-    
-    event = CollegeEvent.query.get_or_404(event_id)
-    profile = CollegeProfile.query.filter_by(id=event.college_id).first()
-    
-    # Security check to ensure user owns this event
-    if profile.user_id != session['user_id']:
-        flash('Unauthorized access', 'danger')
-        return redirect(url_for('profile'))
-    
-    # Delete event image if exists
-    if event.event_image:
-        try:
-            file_path = os.path.join(app.root_path, app.config['GALLERY_FOLDER'], event.event_image)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        except Exception as e:
-            print(f"Error removing event image: {e}")
-    
-    db.session.delete(event)
-    db.session.commit()
-    flash('Event deleted successfully!', 'success')
-    return redirect(url_for('profile'))
-
-# Gallery CRUD routes
-@app.route('/add-gallery-image', methods=['POST'])
-def add_gallery_image():
-    if 'user_id' not in session or User.query.get(session['user_id']).role != 'college':
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    profile = CollegeProfile.query.filter_by(user_id=user.id).first()
-    
-    if not profile:
-        return redirect(url_for('create_college_profile'))
-    
-    if 'gallery_image' in request.files:
-        file = request.files['gallery_image']
-        if file and file.filename != '' and allowed_file(file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
-            filename = secure_filename(f"gallery_{profile.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file_path = os.path.join(app.root_path, app.config['GALLERY_FOLDER'], filename)
-            file.save(file_path)
-            
-            new_image = GalleryImage(
-                college_id=profile.id,
-                image_path=filename,
-                caption=request.form.get('caption', '')
-            )
-            
-            db.session.add(new_image)
-            db.session.commit()
-            flash('Image added to gallery successfully!', 'success')
-        else:
-            flash('Invalid file format. Please upload a PNG, JPG, JPEG, or GIF file.', 'danger')
-    else:
-        flash('No file selected', 'danger')
-    
-    return redirect(url_for('profile'))
-
-@app.route('/delete-gallery-image/<int:image_id>')
-def delete_gallery_image(image_id):
-    if 'user_id' not in session or User.query.get(session['user_id']).role != 'college':
-        return redirect(url_for('login'))
-    
-    image = GalleryImage.query.get_or_404(image_id)
-    profile = CollegeProfile.query.filter_by(id=image.college_id).first()
-    
-    # Security check to ensure user owns this image
-    if profile.user_id != session['user_id']:
-        flash('Unauthorized access', 'danger')
-        return redirect(url_for('profile'))
-    
-    # Delete image file
-    try:
-        file_path = os.path.join(app.root_path, app.config['GALLERY_FOLDER'], image.image_path)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-    except Exception as e:
-        print(f"Error removing gallery image: {e}")
-    
-    db.session.delete(image)
-    db.session.commit()
-    flash('Image removed from gallery successfully!', 'success')
-    return redirect(url_for('profile'))
-
-# Explore route for students
-@app.route('/explore')
-def explore():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    search_query = request.args.get('q', '')
-    search_type = request.args.get('type', 'all')
-    
-    if search_query:
-        if search_type == 'students' or search_type == 'all':
-            students = StudentProfile.query.filter(
-                (StudentProfile.first_name.ilike(f'%{search_query}%')) | 
-                (StudentProfile.last_name.ilike(f'%{search_query}%')) |
-                (StudentProfile.college_name.ilike(f'%{search_query}%')) |
-                (StudentProfile.course.ilike(f'%{search_query}%'))
-            ).all()
-        else:
-            students = []
-        
-        if search_type == 'colleges' or search_type == 'all':
-            colleges = CollegeProfile.query.filter(
-                (CollegeProfile.campus_name.ilike(f'%{search_query}%')) |
-                (CollegeProfile.campus_location.ilike(f'%{search_query}%'))
-            ).all()
-        else:
-            colleges = []
-        
-        if search_type == 'events' or search_type == 'all':
-            events = CollegeEvent.query.filter(
-                (CollegeEvent.event_name.ilike(f'%{search_query}%')) |
-                (CollegeEvent.event_location.ilike(f'%{search_query}%')) |
-                (CollegeEvent.description.ilike(f'%{search_query}%'))
-            ).all()
-        else:
-            events = []
-    else:
-        # No search query, show some defaults
-        students = []
-        colleges = CollegeProfile.query.limit(5).all()
-        events = CollegeEvent.query.order_by(CollegeEvent.event_date.desc()).limit(5).all()
-    
-    return render_template('explore.html', 
-                          user=user, 
-                          students=students, 
-                          colleges=colleges, 
-                          events=events, 
-                          search_query=search_query,
-                          search_type=search_type)
-
-# Logout route
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    if 'user_id' not in session or User

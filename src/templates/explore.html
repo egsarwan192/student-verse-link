@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,26 +9,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Header Section -->
+    <!-- Header -->
     <header class="header">
         <div class="container header-content">
             <div class="logo">
-                <a href="{{ url_for('index') }}">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Campus Connect Logo" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2236%22%20height%3D%2236%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2036%2036%22%3E%3Ccircle%20fill%3D%22%23F97316%22%20cx%3D%2218%22%20cy%3D%2218%22%20r%3D%2218%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C6C11.4%2C6%2C6%2C11.4%2C6%2C18s5.4%2C12%2C12%2C12s12-5.4%2C12-12S24.6%2C6%2C18%2C6z%20M18%2C8c5.5%2C0%2C10%2C4.5%2C10%2C10s-4.5%2C10-10%2C10S8%2C23.5%2C8%2C18S12.5%2C8%2C18%2C8z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C10.5c-1.7%2C0-3%2C1.3-3%2C3s1.3%2C3%2C3%2C3s3-1.3%2C3-3S19.7%2C10.5%2C18%2C10.5z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M18%2C18c-3.9%2C0-7%2C3.1-7%2C7h14C25%2C21.1%2C21.9%2C18%2C18%2C18z%22%2F%3E%3C%2Fsvg%3E'">
-                    <div class="logo-text">Campus Connect</div>
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-graduation-cap text-primary"></i>
+                    <span class="logo-text">Campus Connect</span>
                 </a>
             </div>
-            <div>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline" style="display: flex; align-items: center;">
-                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i> Logout
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Dashboard Content -->
+    <!-- Main Content -->
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-profile">
                 {% if user.role == 'student' %}
@@ -89,194 +88,112 @@
                 </li>
             </ul>
         </div>
-        
+
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Flash Messages -->
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-            
-            <!-- Explore Header -->
-            <div class="page-header">
-                <h1>Explore</h1>
-                <p class="text-muted">Discover students, colleges, and events</p>
-            </div>
-            
-            <!-- Search Form -->
-            <div class="search-container card p-4 mb-6">
+            <div class="search-container card">
                 <form action="{{ url_for('explore') }}" method="GET" class="search-form">
-                    <div class="search-controls">
-                        <div class="search-input-wrapper">
-                            <input type="text" name="q" placeholder="Search students, colleges, or events..." value="{{ search_query }}" class="search-input form-control">
-                            <button type="submit" class="search-btn">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                        </div>
-                        <div class="search-filter">
-                            <select name="type" class="form-control">
-                                <option value="all" {% if search_type == 'all' %}selected{% endif %}>All</option>
-                                <option value="students" {% if search_type == 'students' %}selected{% endif %}>Students</option>
-                                <option value="colleges" {% if search_type == 'colleges' %}selected{% endif %}>Colleges</option>
-                                <option value="events" {% if search_type == 'events' %}selected{% endif %}>Events</option>
-                            </select>
-                        </div>
+                    <div class="search-input-wrapper">
+                        <input type="text" name="q" placeholder="Search students, colleges, events..." value="{{ search_query }}" class="search-input">
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    <div class="search-categories">
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="all" {% if search_type == 'all' %}checked{% endif %}> All
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="students" {% if search_type == 'students' %}checked{% endif %}> Students
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="colleges" {% if search_type == 'colleges' %}checked{% endif %}> Colleges
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="type" value="events" {% if search_type == 'events' %}checked{% endif %}> Events
+                        </label>
                     </div>
                 </form>
             </div>
-            
+
             <!-- Search Results -->
             {% if search_query %}
-                <div class="search-results-header">
-                    <h2>Results for "{{ search_query }}"</h2>
-                </div>
-            {% endif %}
-            
-            <!-- Students Results -->
-            {% if students or not search_query %}
-                <div class="results-section">
-                    <h3 class="results-title">{% if search_type == 'students' %}Matching {% endif %}Students</h3>
-                    
+                <div class="search-results">
                     {% if students %}
-                        <div class="results-grid">
-                            {% for student in students %}
-                                <div class="student-card card">
-                                    <div class="student-header">
-                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + student.profile_picture) }}" alt="{{ student.first_name }}" class="student-avatar" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_profile.jpg') }}'">
+                        <div class="results-section">
+                            <h2>Students</h2>
+                            <div class="results-grid">
+                                {% for student in students %}
+                                    <div class="student-card">
+                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + student.profile_picture) }}" alt="{{ student.first_name }}" class="student-avatar">
                                         <div class="student-info">
-                                            <h4>{{ student.first_name }} {{ student.last_name }}</h4>
-                                            <p class="student-details">{{ student.course }} @ {{ student.college_name }}</p>
+                                            <h3>{{ student.first_name }} {{ student.last_name }}</h3>
+                                            <p>{{ student.college_name }}</p>
+                                            <p class="student-course">{{ student.course }}</p>
+                                        </div>
+                                        <div class="card-actions">
+                                            <button class="btn btn-primary btn-sm">Connect</button>
+                                            <button class="btn btn-outline btn-sm">View Profile</button>
                                         </div>
                                     </div>
-                                    <div class="student-bio">
-                                        {% if student.bio %}
-                                            <p>{{ student.bio|truncate(100) }}</p>
-                                        {% else %}
-                                            <p class="text-muted">No bio available</p>
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-actions">
-                                        <button class="btn btn-outline btn-sm">
-                                            <i class="fas fa-user-plus"></i> Connect
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye"></i> View Profile
-                                        </button>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% elif search_query and search_type == 'students' %}
-                        <div class="card p-4">
-                            <p class="text-center text-muted">No students found matching "{{ search_query }}"</p>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endif %}
-                </div>
-            {% endif %}
-            
-            <!-- Colleges Results -->
-            {% if colleges or not search_query %}
-                <div class="results-section">
-                    <h3 class="results-title">{% if search_type == 'colleges' %}Matching {% endif %}Colleges</h3>
-                    
+
                     {% if colleges %}
-                        <div class="results-grid">
-                            {% for college in colleges %}
-                                <div class="college-card card">
-                                    <div class="college-header">
-                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + college.profile_picture) }}" alt="{{ college.campus_name }}" class="college-avatar" onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/default_college.jpg') }}'">
+                        <div class="results-section">
+                            <h2>Colleges</h2>
+                            <div class="results-grid">
+                                {% for college in colleges %}
+                                    <div class="college-card">
+                                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + college.profile_picture) }}" alt="{{ college.campus_name }}" class="college-avatar">
                                         <div class="college-info">
-                                            <h4>{{ college.campus_name }}</h4>
-                                            <p class="college-details">{{ college.campus_location }} • Est. {{ college.established_year }}</p>
+                                            <h3>{{ college.campus_name }}</h3>
+                                            <p>{{ college.campus_location }}</p>
+                                        </div>
+                                        <div class="card-actions">
+                                            <button class="btn btn-primary btn-sm">Follow</button>
+                                            <button class="btn btn-outline btn-sm">View Profile</button>
                                         </div>
                                     </div>
-                                    <div class="college-description">
-                                        {% if college.description %}
-                                            <p>{{ college.description|truncate(100) }}</p>
-                                        {% else %}
-                                            <p class="text-muted">No description available</p>
-                                        {% endif %}
-                                    </div>
-                                    <div class="card-actions">
-                                        <button class="btn btn-outline btn-sm">
-                                            <i class="fas fa-star"></i> Follow
-                                        </button>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-eye"></i> View Profile
-                                        </button>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% elif search_query and search_type == 'colleges' %}
-                        <div class="card p-4">
-                            <p class="text-center text-muted">No colleges found matching "{{ search_query }}"</p>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endif %}
-                </div>
-            {% endif %}
-            
-            <!-- Events Results -->
-            {% if events or not search_query %}
-                <div class="results-section">
-                    <h3 class="results-title">{% if search_type == 'events' %}Matching {% endif %}Events</h3>
-                    
+
                     {% if events %}
-                        <div class="events-grid">
-                            {% for event in events %}
-                                <div class="event-card card">
-                                    {% if event.event_image %}
-                                        <div class="event-image">
-                                            <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}">
-                                        </div>
-                                    {% endif %}
-                                    <div class="event-content p-4">
-                                        <h3>{{ event.event_name }}</h3>
-                                        <div class="event-meta">
-                                            <p><i class="fas fa-calendar-alt"></i> {{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }}</p>
-                                            <p><i class="fas fa-map-marker-alt"></i> {{ event.event_location }}</p>
-                                            {% set college = event.college %}
-                                            <p><i class="fas fa-university"></i> Hosted by {{ college.campus_name }}</p>
-                                        </div>
-                                        {% if event.description %}
-                                            <p class="event-description mt-3">{{ event.description|truncate(100) }}</p>
+                        <div class="results-section">
+                            <h2>Events</h2>
+                            <div class="events-grid">
+                                {% for event in events %}
+                                    <div class="event-card">
+                                        {% if event.event_image %}
+                                            <img src="{{ url_for('static', filename='uploads/gallery/' + event.event_image) }}" alt="{{ event.event_name }}" class="event-image">
                                         {% endif %}
-                                        <div class="card-actions mt-4">
-                                            <button class="btn btn-outline btn-sm">
-                                                <i class="fas fa-calendar-check"></i> Interested
-                                            </button>
-                                            <button class="btn btn-primary btn-sm">
-                                                <i class="fas fa-info-circle"></i> Details
-                                            </button>
+                                        <div class="event-content">
+                                            <h3>{{ event.event_name }}</h3>
+                                            <p>{{ event.event_date.strftime('%B %d, %Y') }}</p>
+                                            <p>{{ event.event_location }}</p>
+                                        </div>
+                                        <div class="card-actions">
+                                            <button class="btn btn-primary btn-sm">Details</button>
                                         </div>
                                     </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% elif search_query and search_type == 'events' %}
-                        <div class="card p-4">
-                            <p class="text-center text-muted">No events found matching "{{ search_query }}"</p>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endif %}
                 </div>
-            {% endif %}
-            
-            <!-- No Results At All -->
-            {% if search_query and not students and not colleges and not events %}
-                <div class="card p-4">
-                    <p class="text-center text-muted">No results found for "{{ search_query }}"</p>
-                    <div class="text-center mt-4">
-                        <a href="{{ url_for('explore') }}" class="btn btn-primary">Clear Search</a>
-                    </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-search fa-3x"></i>
+                    <h2>Start Exploring</h2>
+                    <p>Search for students, colleges, or events to connect with the community</p>
                 </div>
             {% endif %}
         </div>
     </div>
 </body>
 </html>
+</lov-write>
